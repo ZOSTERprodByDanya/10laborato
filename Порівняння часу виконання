@@ -1,0 +1,22 @@
+import time
+
+# Синхронний варіант
+start_time = time.time()
+loader = CoinbaseLoader()
+endpoints = ["prices/BTC-USD/historic"] * 10  # 10 запитів
+data_sync = [loader.get_data_history(endpoint) for endpoint in endpoints]
+sync_duration = time.time() - start_time
+
+# Асинхронний варіант
+async def measure_async_time():
+    start_time = time.time()
+    loader = AsyncDataLoader()
+    endpoints = ["prices/BTC-USD/historic"] * 10  # 10 запитів
+    data_async = await loader.get_data_history(endpoints)
+    async_duration = time.time() - start_time
+    return async_duration
+
+async_duration = asyncio.run(measure_async_time())
+
+print(f"Синхронний час виконання: {sync_duration} секунд")
+print(f"Асинхронний час виконання: {async_duration} секунд")
