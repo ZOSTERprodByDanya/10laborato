@@ -1,0 +1,28 @@
+import asyncio
+import httpx
+
+class AsyncDataLoader:
+    def __init__(self, base_url="https://api.coinbase.com/v2/"):
+        self.base_url = base_url
+
+    async def fetch(self, client, endpoint, params=None):
+        url = f"{self.base_url}{endpoint}"
+        response = await client.get(url, params=params)
+        response.raise_for_status()
+        return response.json()
+
+    async def get_data_history(self, endpoints):
+        async with httpx.AsyncClient() as client:
+            tasks = [self.fetch(client, endpoint) for endpoint in endpoints]
+            results = await asyncio.gather(*tasks)
+        return results
+
+# Приклад використання
+async def main():
+    loader = AsyncDataLoader()
+    endpoints = ["prices/BTC-USD/historic", "prices/ETH-USD/historic"]  # до 10-ти запитів
+    data = await loader.get_data_history(endpoints)
+    print(data)
+
+asyncio.run(main())
+
